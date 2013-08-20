@@ -13,7 +13,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/Kukunin/cursor_pagination"
   spec.license       = "MIT"
 
+  spec.add_dependency "activerecord"
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "sqlite3-ruby"
+  spec.add_development_dependency "database_cleaner", ['< 1.1.1']
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
