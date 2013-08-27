@@ -60,7 +60,9 @@ describe Entity do
     describe "#next_cursor" do
       ##Default settings
       specify { Entity.cursor(nil).per(10).next_cursor.should eq -1 }
+      specify { Entity.cursor(nil).per(10).should be_last_page }
       specify { Entity.cursor(nil).per(1).next_cursor.should eq first_entity.id}
+      specify { Entity.cursor(nil).per(1).should_not be_last_page}
       specify { Entity.cursor(third_entity.id).next_cursor.should eq -1 }
 
       ##Reverse order
@@ -77,10 +79,13 @@ describe Entity do
       ##Default settings
       #no previous page
       specify { Entity.cursor(nil).previous_cursor.should eq -1 }
+      specify { Entity.cursor(nil).should be_first_page }
       #not full previous page
       specify { Entity.cursor(first_entity.id).previous_cursor.should be_nil }
+      specify { Entity.cursor(first_entity.id).should_not be_first_page }
       #full previous page
       specify { Entity.cursor(second_entity.id).per(1).previous_cursor.should eq first_entity.id }
+      specify { Entity.cursor(second_entity.id).per(1).should_not be_first_page }
 
       ##Reverse order
       specify { Entity.order('id DESC').cursor(nil, reverse: true).previous_cursor.should eq -1 }
