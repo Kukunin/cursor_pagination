@@ -5,12 +5,12 @@ module CursorPagination
     extend ActiveSupport::Concern
 
     included do
-      scope :cursor, Proc.new { |*arg|
-        (if arg.last.blank?
-          where('1=1') #dirty hack to emulated empty scope
-        else
-          where(*arg)
-        end).limit(25)
+      scope :cursor, Proc.new { |cursor, options|
+        options = { column: :id, reverse: false }.merge(options || {})
+
+        scope = self
+        scope = scope.where("#{options[:column]} #{options[:reverse] ? '<' : '>'} ?", cursor) if cursor
+        scope.limit(25)
       } do
         include CursorPagination::PageScopeMethods
       end

@@ -18,19 +18,25 @@ describe Entity do
     end
 
     it "returns first entity only" do
-      result = Entity.cursor('id > ?', nil).per(1).to_a
+      result = Entity.cursor(nil).per(1).to_a
       result.size.should eq 1
       result.first.should eq first_entity
     end
 
     it "returns second entity only" do
-      result = Entity.cursor('id > ?', first_entity.id).per(1).to_a
+      result = Entity.cursor(first_entity.id).per(1).to_a
       result.size.should eq 1
       result.first.should eq second_entity
     end
 
     it "support different orders" do
-      result = Entity.order('id DESC').cursor('id < ?', second_entity.id).per(1).to_a
+      result = Entity.order('id DESC').cursor(second_entity.id, reverse: true).per(1).to_a
+      result.size.should eq 1
+      result.first.should eq first_entity
+    end
+
+    it "support different columns" do
+      result = Entity.cursor(second_entity.id, column: :custom).per(1).to_a
       result.size.should eq 1
       result.first.should eq first_entity
     end
@@ -41,7 +47,7 @@ describe Entity do
       end
 
       it "returns all Entities" do
-        result = Entity.cursor('id < ?', nil).to_a
+        result = Entity.cursor(nil).to_a
         result.size.should eq 25
       end
     end
