@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activerecord", ['>= 3.0.0']
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "sqlite3-ruby"
-  spec.add_development_dependency "database_cleaner", ['< 1.1.1']
+  spec.add_development_dependency "database_cleaner", ['< 1.1.0']
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
