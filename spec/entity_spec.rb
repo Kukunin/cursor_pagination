@@ -2,15 +2,7 @@ require 'spec_helper'
 
 describe Entity do
 
-  before do
-    4.times { |n| Entity.create! custom: (4 - n)}
-  end
-
-  let(:entities) { Entity.all.to_a }
-  let(:first_entity) { entities.first }
-  let(:second_entity) { entities[1] }
-  let(:third_entity) { entities[2] }
-  let(:last_entity) { entities[3] }
+  include_context "entities"
 
   specify do
     first_entity.id.should be < second_entity.id
@@ -19,13 +11,13 @@ describe Entity do
 
   describe "#cursor method" do
     it "returns first entity only" do
-      result = Entity.cursor(nil).per(1).to_a
+      result = first_page.to_a
       result.size.should eq 1
       result.first.should eq first_entity
     end
 
     it "returns second entity only" do
-      result = Entity.cursor(first_entity.id).per(1).to_a
+      result = second_page.to_a
       result.size.should eq 1
       result.first.should eq second_entity
     end
@@ -61,9 +53,9 @@ describe Entity do
       ##Default settings
       specify { Entity.cursor(nil).per(10).next_cursor.should eq -1 }
       specify { Entity.cursor(nil).per(10).should be_last_page }
-      specify { Entity.cursor(nil).per(1).next_cursor.should eq first_entity.id}
-      specify { Entity.cursor(nil).per(1).should_not be_last_page}
-      specify { Entity.cursor(third_entity.id).next_cursor.should eq -1 }
+      specify { first_page.next_cursor.should eq first_entity.id}
+      specify { first_page.should_not be_last_page}
+      specify { last_page.next_cursor.should eq -1 }
 
       ##Reverse order
       specify { Entity.order('id DESC').cursor(nil, reverse: true).per(1).next_cursor.should eq last_entity.id }
@@ -84,8 +76,8 @@ describe Entity do
       specify { Entity.cursor(first_entity.id).previous_cursor.should be_nil }
       specify { Entity.cursor(first_entity.id).should_not be_first_page }
       #full previous page
-      specify { Entity.cursor(second_entity.id).per(1).previous_cursor.should eq first_entity.id }
-      specify { Entity.cursor(second_entity.id).per(1).should_not be_first_page }
+      specify { third_page.previous_cursor.should eq first_entity.id }
+      specify { third_page.should_not be_first_page }
 
       ##Reverse order
       specify { Entity.order('id DESC').cursor(nil, reverse: true).previous_cursor.should eq -1 }
