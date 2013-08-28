@@ -17,17 +17,18 @@ module CursorPagination
         @cursor_options
       end
 
-      scope :cursor, Proc.new { |cursor, options|
-        options = { column: :id, reverse: false }.merge(options || {})
+      def self.cursor(cursor, options = {})
+        options.reverse_merge! column: :id, reverse: false
+        scoped_method = ActiveRecord::VERSION::STRING < '4.0' ? :scoped : :all
         @current_cursor = cursor
-        @origin_scope = self.all
+        @origin_scope = self.send scoped_method
         @cursor_options = options
 
         scope = @origin_scope
         scope = scope.where("#{options[:column]} #{options[:reverse] ? '<' : '>'} ?", cursor) if cursor
-        scope.limit(25)
-      } do
-        include CursorPagination::PageScopeMethods
+        scope = scope.limit(25)
+
+        scope.extending(CursorPagination::PageScopeMethods)
       end
     end
   end
