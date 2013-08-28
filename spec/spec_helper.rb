@@ -3,12 +3,12 @@
 # Require this file using `require "spec_helper"` to ensure that it is only
 # loaded once.
 require 'active_record'
-require 'database_cleaner'
-
 require 'cursor_pagination'
 
-ActiveRecord::Base.configurations = {'test' => {:adapter => 'sqlite3', :database => ':memory:'}}
-ActiveRecord::Base.establish_connection('test')
+require 'fake_app/rails'
+require 'rspec/rails'
+
+require 'database_cleaner'
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 #
@@ -25,7 +25,6 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:suite) do
-    CreateEntities.up unless ActiveRecord::Base.connection.table_exists? 'entities'
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
   end
