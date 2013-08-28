@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/Kukunin/cursor_pagination"
   spec.license       = "MIT"
 
-  spec.add_dependency "activerecord", ['>= 3.0.0']
+  spec.add_dependency "activerecord", ['>= 3.1']
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "sqlite3-ruby"
   spec.add_development_dependency "database_cleaner", ['< 1.1.0']
