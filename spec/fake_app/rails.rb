@@ -17,6 +17,7 @@ app.initialize!
 
 # routes
 app.routes.draw do
+  resources :entities
 end
 
 #models
