@@ -61,24 +61,27 @@ describe Entity do
   end
 
   describe "cursor methods" do
+    def e(cursor)
+      Base64.strict_encode64 cursor.to_s
+    end
     # nil is valid cursor too, it means first page
     # -1 means unavailable cursor (last or first page)
     describe "#next_cursor" do
       ##Default settings
       specify { Entity.cursor(nil).per(10).next_cursor.should eq -1 }
       specify { Entity.cursor(nil).per(10).should be_last_page }
-      specify { first_page.next_cursor.should eq first_entity.id}
+      specify { first_page.next_cursor.should eq e(first_entity.id)}
       specify { first_page.should_not be_last_page}
       specify { last_page.next_cursor.should eq -1 }
 
       ##Reverse order
-      specify { Entity.order('id DESC').cursor(nil, reverse: true).per(1).next_cursor.should eq last_entity.id }
+      specify { Entity.order('id DESC').cursor(nil, reverse: true).per(1).next_cursor.should eq e(last_entity.id) }
       specify { Entity.order('id DESC').cursor(second_entity.id, reverse: true).per(1).next_cursor.should eq -1 }
 
       ##With custom column
       specify { Entity.order('custom ASC').cursor(second_entity.custom, column: :custom).per(1).next_cursor.should eq -1 }
-      specify { Entity.order('custom ASC').cursor(third_entity.custom, column: :custom).per(1).next_cursor.should eq second_entity.custom }
-      specify { Entity.order('custom ASC').cursor(nil, column: :custom).per(1).next_cursor.should eq last_entity.custom }
+      specify { Entity.order('custom ASC').cursor(third_entity.custom, column: :custom).per(1).next_cursor.should eq e(second_entity.custom) }
+      specify { Entity.order('custom ASC').cursor(nil, column: :custom).per(1).next_cursor.should eq e(last_entity.custom) }
     end
 
     describe "#previous_cursor" do
@@ -90,18 +93,18 @@ describe Entity do
       specify { Entity.cursor(first_entity.id).previous_cursor.should be_nil }
       specify { Entity.cursor(first_entity.id).should_not be_first_page }
       #full previous page
-      specify { third_page.previous_cursor.should eq first_entity.id }
+      specify { third_page.previous_cursor.should eq e(first_entity.id) }
       specify { third_page.should_not be_first_page }
 
       ##Reverse order
       specify { Entity.order('id DESC').cursor(nil, reverse: true).previous_cursor.should eq -1 }
       specify { Entity.order('id DESC').cursor(last_entity.id, reverse: true).previous_cursor.should be_nil }
-      specify { Entity.order('id DESC').cursor(third_entity.id, reverse: true).per(1).previous_cursor.should eq last_entity.id }
+      specify { Entity.order('id DESC').cursor(third_entity.id, reverse: true).per(1).previous_cursor.should eq e(last_entity.id) }
 
       ##With custom column
       specify { Entity.order('custom ASC').cursor(nil, column: :custom).previous_cursor.should eq -1 }
       specify { Entity.order('custom ASC').cursor(last_entity.custom, column: :custom).previous_cursor.should be_nil }
-      specify { Entity.order('custom ASC').cursor(third_entity.custom, column: :custom).per(1).previous_cursor.should eq last_entity.custom }
+      specify { Entity.order('custom ASC').cursor(third_entity.custom, column: :custom).per(1).previous_cursor.should eq e(last_entity.custom) }
     end
   end
 end

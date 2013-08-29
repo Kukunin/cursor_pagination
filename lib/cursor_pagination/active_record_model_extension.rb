@@ -21,10 +21,12 @@ module CursorPagination
         if cursor_column_type == :datetime and cursor.is_a? Time
           cursor = cursor.to_yaml
         end
-        cursor
+        Base64.strict_encode64 cursor.to_s
       end
 
       def self.decode_cursor(cursor)
+        (cursor = Base64.strict_decode64 cursor) rescue nil
+
         if cursor_column_type == :datetime and cursor.is_a? String
           cursor = YAML.load(cursor)
         end
