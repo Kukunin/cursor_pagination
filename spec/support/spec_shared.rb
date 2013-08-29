@@ -1,6 +1,6 @@
 shared_context "entities" do
   before do
-    4.times { |n| Entity.create! custom: (4 - n)}
+    4.times { |n| Entity.create! custom: (4 - n), custom_time: n.minutes.ago}
   end
 
   let(:entities) { Entity.all.to_a }

@@ -34,6 +34,20 @@ describe Entity do
       result.first.should eq first_entity
     end
 
+    describe "time columns" do
+      let(:scope) { Entity.order('custom_time ASC') }
+      let(:first_page) { scope.cursor(nil, column: :custom_time).per(1) }
+      let(:second_page) { scope.cursor(first_page.next_cursor, column: :custom_time).per(1) }
+      let(:previous_page) { scope.cursor(second_page.previous_cursor, column: :custom_time).per(1) }
+      let(:third_page) { scope.cursor(second_page.next_cursor, column: :custom_time).per(1) }
+
+      specify { first_page.first.should eq last_entity }
+      specify { first_page.next_cursor.should be_a String }
+      specify { second_page.first.should eq third_entity }
+      specify { third_page.first.should eq second_entity }
+      specify { previous_page.first.should eq last_entity }
+    end
+
     context "without #per method" do
       before do
         25.times { Entity.create! }
