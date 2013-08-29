@@ -5,36 +5,41 @@ module CursorPagination
     end
 
     def first_page?
-      previous_cursor == -1
+      previous_cursor.value == -1
     end
 
     def last_page?
-      next_cursor == -1
+      next_cursor.value == -1
     end
 
     def previous_cursor
-      return -1 if current_cursor.nil?
-      options = cursor_options
-      scope = _origin_scope.where("#{options[:column]} #{options[:reverse] ? '>' : '<'}= ?", decode_cursor(current_cursor)).limit(limit_value+1)
-
-      result = scope.to_a
-
-      case result.size
-      when limit_value+1
-        encode_cursor result.first.send(options[:column])
-      when 0
-        -1 #no previous page
+      Cursor.new(if current_cursor.empty?
+        -1
       else
-        nil #first page, incomplete
-      end
+        options = cursor_options
 
+        scope = _origin_scope.where("#{options[:column]} #{options[:reverse] ? '>' : '<'}= ?", current_cursor.value).limit(limit_value+1).reverse_order
+        result = scope.to_a
+
+        case result.size
+        when limit_value+1
+          result.last.send(options[:column])
+        when 0
+          -1 #no previous page
+        else
+          nil #first page, incomplete
+        end
+      end)
     end
 
     def next_cursor
-      return -1 if last.nil?
-      # try to get something after last cursor
-      cursor = encode_cursor last.send(cursor_options[:column])
-      _origin_scope.cursor(cursor, cursor_options).per(1).count.zero? ? -1 : cursor
+      Cursor.new(if last.nil?
+        -1
+      else
+        # try to get something after last cursor
+        cursor = Cursor.new last.send(cursor_options[:column])
+        _origin_scope.cursor(cursor, cursor_options).per(1).count.zero? ? -1 : cursor.value
+      end)
     end
   end
 end

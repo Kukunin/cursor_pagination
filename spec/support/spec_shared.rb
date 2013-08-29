@@ -10,7 +10,11 @@ shared_context "entities" do
   let(:last_entity) { entities[3] }
 
   let(:first_page) { Entity.cursor(nil).per(1) }
-  let(:second_page) { Entity.cursor(first_entity.id).per(1) }
-  let(:third_page) { Entity.cursor(second_entity.id).per(1) }
-  let(:last_page) { Entity.cursor(third_entity.id).per(1) }
+  let(:second_page) { Entity.cursor(c(first_entity.id)).per(1) }
+  let(:third_page) { Entity.cursor(c(second_entity.id)).per(1) }
+  let(:last_page) { Entity.cursor(c(third_entity.id)).per(1) }
+
+  def c(cursor)
+    CursorPagination::Cursor.new cursor
+  end
 end

@@ -16,7 +16,7 @@ describe CursorPagination::ActionViewHelper do
         subject { helper.previous_cursor_link third_page, 'Previous', {:controller => 'entities', :action => 'index'} }
         it { should be_a String }
         it { should match(/rel="previous"/) }
-        it { should match(/cursor=#{first_entity.id}/) }
+        it { should match("cursor=#{CGI.escape(c(first_entity.id).to_s)}") }
       end
       context 'overriding rel=' do
         subject { helper.previous_cursor_link second_page, 'Previous', {:controller => 'entities', :action => 'index'}, {:rel => 'external'} }
@@ -35,7 +35,7 @@ describe CursorPagination::ActionViewHelper do
         subject { helper.next_cursor_link first_page, 'More', {:controller => 'entities', :action => 'index'} }
         it { should be_a String }
         it { should match(/rel="next"/) }
-        it { should match(/cursor=#{first_entity.id}/) }
+        it { should match("cursor=#{CGI.escape(c(first_entity.id).to_s)}") }
       end
       context 'overriding rel=' do
         subject { helper.next_cursor_link first_page, 'More', {:controller => 'entities', :action => 'index'}, { :rel => 'external' } }
