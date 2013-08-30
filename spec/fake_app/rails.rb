@@ -25,6 +25,19 @@ require 'fake_app/active_record/models' if defined? ActiveRecord
 
 # controllers
 class ApplicationController < ActionController::Base; end
+class EntitiesController < ApplicationController
+
+  def index
+    ActionView::Base.send :include, ::CursorPagination::ActionViewHelper
+
+    @entities = Entity.order('custom ASC').cursor(params[:cursor], column: :custom).per(1)
+    render :inline => %q/
+    <%= previous_cursor_link(@entities, "Previous Page") %>
+    <%= @entities.map { |n| "Custom #{n.custom}" }.join("\n") %>
+    <%= next_cursor_link(@entities, "Next Page") %>/
+  end
+
+end
 
 # helpers
 Object.const_set(:ApplicationHelper, Module.new)

@@ -7,6 +7,7 @@ require 'cursor_pagination'
 
 require 'fake_app/rails'
 require 'rspec/rails'
+require 'capybara/rspec'
 
 require 'database_cleaner'
 
