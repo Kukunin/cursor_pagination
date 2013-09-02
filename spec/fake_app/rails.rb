@@ -32,8 +32,6 @@ class ApplicationController < ActionController::Base; end
 class EntitiesController < ApplicationController
 
   def index
-    ActionView::Base.send :include, ::CursorPagination::ActionViewHelper
-
     @entities = Entity.order('custom ASC').cursor(params[:cursor], column: :custom).per(1)
     render :inline => %q/
     <%= previous_cursor_link(@entities, "Previous Page") %>
@@ -46,8 +44,6 @@ end
 module TwoColumn
   class EntitiesController < ApplicationController
     def index
-      ActionView::Base.send :include, ::CursorPagination::ActionViewHelper
-
       @entities = Entity.order('custom_time DESC, id DESC').cursor(params[:cursor], columns: { custom_time: { reverse: true }, id: { reverse: true } }).per(1)
       render :inline => %q/
       <%= previous_cursor_link(@entities, "Previous Page") %>

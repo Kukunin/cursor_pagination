@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.add_dependency "activerecord", ['>= 3.1']
+  spec.add_dependency "actionpack", ['>= 3.1']
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "railties"
   spec.add_development_dependency "capybara"
