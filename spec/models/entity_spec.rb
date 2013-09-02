@@ -9,6 +9,24 @@ describe Entity do
     first_entity.custom.should be > second_entity.custom
   end
 
+  describe "cursor_options" do
+    it "accepts default values" do
+      options = Entity.cursor(nil).cursor_options
+      options[:columns].should eq id: { reverse: false }
+    end
+
+    it "accepts short column notation" do
+      options = Entity.cursor(nil, column: :custom, reverse: true).cursor_options
+      options[:columns].should eq custom: { reverse: true }
+    end
+
+    it "prefer full columns notation" do
+      full_options = { custom: { reverse: false } }
+      options = Entity.cursor(nil, column: :custom_time, reverse: true, columns: full_options).cursor_options
+      options[:columns].should eq full_options
+    end
+  end
+
   describe "#cursor method" do
     it "returns first entity only" do
       result = first_page.to_a
@@ -35,11 +53,18 @@ describe Entity do
     end
 
     describe "time columns" do
-      let(:scope) { Entity.order('custom_time ASC') }
-      let(:first_page) { scope.cursor(nil, column: :custom_time).per(1) }
-      let(:second_page) { scope.cursor(first_page.next_cursor, column: :custom_time).per(1) }
-      let(:previous_page) { scope.cursor(second_page.previous_cursor, column: :custom_time).per(1) }
-      let(:third_page) { scope.cursor(second_page.next_cursor, column: :custom_time).per(1) }
+      let(:columns) do
+        { custom_time: { reverse: false }, id: { reverse: false } }
+      end
+      let(:scope) { Entity.order('custom_time ASC, id ASC') }
+      let(:first_page) { scope.cursor(nil, columns: columns ).per(1) }
+      specify { first_page.next_cursor.value.should eq [last_entity.custom_time, last_entity.id] }
+      let(:second_page) { scope.cursor(first_page.next_cursor, columns: columns).per(1) }
+      specify { second_page.next_cursor.value.should eq [third_entity.custom_time, third_entity.id] }
+      let(:previous_page) { scope.cursor(second_page.previous_cursor, columns: columns).per(1) }
+      specify { previous_page.next_cursor.value.should eq [last_entity.custom_time, last_entity.id] }
+      let(:third_page) { scope.cursor(second_page.next_cursor, columns: columns).per(1) }
+      specify { third_page.next_cursor.value.should eq [second_entity.custom_time, second_entity.id] }
 
       specify { first_page.first.should eq last_entity }
       specify { second_page.first.should eq third_entity }
@@ -104,6 +129,31 @@ describe Entity do
       specify { Entity.order('custom ASC').cursor(c(third_entity.custom), column: :custom).per(1).previous_cursor.value.should eq last_entity.custom }
       specify { Entity.order('custom ASC').cursor(c(second_entity.custom), column: :custom).per(1).previous_cursor.value.should eq third_entity.custom }
       specify { Entity.order('custom ASC').cursor(c(first_entity.custom), column: :custom).per(1).previous_cursor.value.should eq second_entity.custom }
+    end
+  end
+
+  describe "._cursor_to_where" do
+    let(:time) { Time.at 1378132362 }
+    let(:columns) do
+      { id: { reverse: true }, custom: { reverse: false }, custom_time: { reverse: false } }
+    end
+    let(:cursor_value) { [1,2,time] }
+    let(:cursor) { CursorPagination::Cursor.new cursor_value }
+
+    context "with direct sql" do
+      specify do
+        target_sql = "(\"entities\".\"id\" < 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" > 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" > '2013-09-02 14:32:42.000000'))"
+        where = Entity.send(:_cursor_to_where, columns, cursor_value)
+        where.to_sql.should eq target_sql
+      end
+    end
+
+    context "with reversed sql" do
+      specify do
+        target_sql = "(\"entities\".\"id\" > 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" < 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" <= '2013-09-02 14:32:42.000000'))"
+        where = Entity.send(:_cursor_to_where, columns, cursor_value, true)
+        where.to_sql.should eq target_sql
+      end
     end
   end
 end

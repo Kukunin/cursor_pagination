@@ -20,6 +20,18 @@ module CursorPagination
       end
     end
 
+    def self.value_from_entity(entity, columns)
+      value = []
+      columns.each_key do |column|
+        value << entity.send(column)
+      end
+      value.size == 1 ? value.first : value
+    end
+
+    def self.from_entity(entity, columns)
+      new value_from_entity(entity, columns)
+    end
+
     def encoded
       Base64.strict_encode64 cursor.to_yaml
     end

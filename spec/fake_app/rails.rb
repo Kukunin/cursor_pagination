@@ -18,6 +18,10 @@ app.initialize!
 # routes
 app.routes.draw do
   resources :entities
+
+  namespace :two_column do
+    resources :entities
+  end
 end
 
 #models
@@ -37,6 +41,21 @@ class EntitiesController < ApplicationController
     <%= next_cursor_link(@entities, "Next Page") %>/
   end
 
+end
+
+module TwoColumn
+  class EntitiesController < ApplicationController
+    def index
+      ActionView::Base.send :include, ::CursorPagination::ActionViewHelper
+
+      @entities = Entity.order('custom_time DESC, id DESC').cursor(params[:cursor], columns: { custom_time: { reverse: true }, id: { reverse: true } }).per(1)
+      render :inline => %q/
+      <%= previous_cursor_link(@entities, "Previous Page") %>
+      <%= @entities.map { |n| "Custom #{n.custom}" }.join("\n") %>
+      <%= next_cursor_link(@entities, "Next Page") %>/
+    end
+
+  end
 end
 
 # helpers

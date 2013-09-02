@@ -2,9 +2,6 @@ require 'spec_helper'
 
 describe EntitiesController do
 
-  include_context "entities"
-
-  before { visit entities_path }
   subject { page }
 
   shared_examples_for "first page" do
@@ -43,31 +40,56 @@ describe EntitiesController do
   end
 
 
-  it_should_behave_like "first page"
+  shared_examples_for "cursor pagination" do
+    it_should_behave_like "first page"
 
-  describe "second page" do
-    before { click_link "Next Page" }
-    it_should_behave_like "second page"
-
-    describe "third page" do
+    describe "second page" do
       before { click_link "Next Page" }
-      it_should_behave_like "third page"
+      it_should_behave_like "second page"
 
-      describe "last page" do
+      describe "third page" do
         before { click_link "Next Page" }
-        it_should_behave_like "last page"
+        it_should_behave_like "third page"
 
-        describe "previous page" do
-          before { click_link "Previous Page" }
-          it_should_behave_like "third page"
+        describe "last page" do
+          before { click_link "Next Page" }
+          it_should_behave_like "last page"
 
-          it_should_behave_like "previous second page"
+          describe "previous page" do
+            before { click_link "Previous Page" }
+            it_should_behave_like "third page"
+
+            it_should_behave_like "previous second page"
+          end
         end
+
+        it_should_behave_like "previous second page"
       end
 
-      it_should_behave_like "previous second page"
+      it_should_behave_like "previous first page"
+    end
+  end
+
+  context "by custom" do
+    include_context "entities"
+
+    before { visit entities_path }
+
+    it_should_behave_like "cursor pagination"
+  end
+
+  context "by two-columns" do
+    before do
+      two_minutes_ago = 2.minutes.ago
+      Entity.create! custom: 1, custom_time: 1.minute.ago
+      Entity.create! custom: 3, custom_time: two_minutes_ago
+      Entity.create! custom: 2, custom_time: two_minutes_ago
+      Entity.create! custom: 4, custom_time: 3.minutes.ago
+
+      visit two_column_entities_path
     end
 
-    it_should_behave_like "previous first page"
+    it_should_behave_like "cursor pagination"
   end
+
 end

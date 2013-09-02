@@ -16,14 +16,16 @@ module CursorPagination
       Cursor.new(if current_cursor.empty?
         -1
       else
-        options = cursor_options
+        scope = _origin_scope.limit(limit_value+1).reverse_order
+        columns = cursor_options[:columns]
 
-        scope = _origin_scope.where("#{options[:column]} #{options[:reverse] ? '>' : '<'}= ?", current_cursor.value).limit(limit_value+1).reverse_order
+        cursor_value = [*current_cursor.value]
+        scope = scope.where _cursor_to_where(columns, cursor_value, true)
         result = scope.to_a
 
         case result.size
         when limit_value+1
-          result.last.send(options[:column])
+          Cursor.value_from_entity result.last, columns
         when 0
           -1 #no previous page
         else
@@ -37,7 +39,7 @@ module CursorPagination
         -1
       else
         # try to get something after last cursor
-        cursor = Cursor.new last.send(cursor_options[:column])
+        cursor = Cursor.from_entity last, cursor_options[:columns]
         _origin_scope.cursor(cursor, cursor_options).per(1).count.zero? ? -1 : cursor.value
       end)
     end
