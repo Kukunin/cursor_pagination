@@ -34,6 +34,10 @@ You can pass options as second argument for `cursor` scope
 
     User.order('id DESC').cursor(params[:cursor], reverse: true).per(20)
 
+You can also use multi columns for your entities
+
+    News.order('published_at DESC, id DESC').cursor(params[:cursor], columns: { published_at: { reverse: true }, id: { reverse: true } }).per(20)
+
 ## How it works?
 
 Actually, cursor is column value of specific entity, it uses to get all entities, later than specific. For example, if you have the Users set with IDs from 1 to 5,
@@ -50,6 +54,8 @@ At this point, `cursor` scope accepts these options:
 
 * `reverse`: Set it to true, if your set are ordered descendingly (_DESC_). Default: _false_
 * `column`: column value of cursor. For example, if you order your data set by *updated_at*, set *updated_at* column for cursor. Default: _id_
+* `columns`: hash with columns information, where key is the column name and the value is column options. The available options is
+    * reverse: The same as global `reverse` option, but related to current column. Default: _false_
 
 ## Scope methods
 
