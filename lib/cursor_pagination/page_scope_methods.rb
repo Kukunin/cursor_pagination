@@ -1,5 +1,29 @@
 module CursorPagination
   module PageScopeMethods
+    def current_cursor
+      @current_cursor
+    end
+
+    def current_cursor=(cursor)
+      @current_cursor = cursor
+    end
+
+    def _origin_scope
+      @origin_scope
+    end
+
+    def _origin_scope=(scope)
+      @origin_scope = scope
+    end
+
+    def cursor_options
+      @cursor_options
+    end
+
+    def cursor_options=(options)
+      @cursor_options = options
+    end
+
     def per(num)
       limit(num)
     end

@@ -9,6 +9,23 @@ describe Entity do
     first_entity.custom.should be > second_entity.custom
   end
 
+  describe "cursor-specific options" do
+    let(:first_options) do
+      { column: :custom, reverse: false }
+    end
+    let(:second_options) do
+      { column: :id, reverse: true }
+    end
+
+    it "doesn't overlap each other" do
+      first_scope = Entity.cursor(nil, first_options)
+      second_scope = Entity.cursor(nil, second_options)
+
+      first_scope.per(10).cursor_options.should eq first_options
+      second_scope.cursor_options.should eq second_options
+    end
+  end
+
   describe "cursor_options" do
     it "accepts default values" do
       options = Entity.cursor(nil).cursor_options
