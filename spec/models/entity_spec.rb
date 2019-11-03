@@ -159,7 +159,7 @@ describe Entity do
 
     context "with direct sql" do
       specify do
-        target_sql = "(\"entities\".\"id\" < 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" > 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" > '2013-09-02 14:32:42.000000'))"
+        target_sql = "(\"entities\".\"id\" < 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" > 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" > '2013-09-02 14:32:42'))"
         where = Entity.send(:_cursor_to_where, columns, cursor_value)
         where.to_sql.should eq target_sql
       end
@@ -167,7 +167,7 @@ describe Entity do
 
     context "with reversed sql" do
       specify do
-        target_sql = "(\"entities\".\"id\" > 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" < 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" <= '2013-09-02 14:32:42.000000'))"
+        target_sql = "(\"entities\".\"id\" > 1 OR \"entities\".\"id\" = 1 AND (\"entities\".\"custom\" < 2 OR \"entities\".\"custom\" = 2 AND \"entities\".\"custom_time\" <= '2013-09-02 14:32:42'))"
         where = Entity.send(:_cursor_to_where, columns, cursor_value, true)
         where.to_sql.should eq target_sql
       end
