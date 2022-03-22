@@ -1,3 +1,7 @@
+# Abandoned
+
+This repository is old and unmaintained for a long time. Consider using other pagination gems, for example https://github.com/ddnexus/pagy
+
 # CursorPagination
 
 ActiveRecord plugin for cursor based pagination. It uses specific model's column and rpp (results per page) to paginate your content.
