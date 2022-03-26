@@ -2,7 +2,15 @@
 require 'action_controller/railtie'
 require 'action_view/railtie'
 
-require 'fake_app/active_record/config' if defined? ActiveRecord
+if defined? ActiveRecord
+  ActiveRecord::Base.establish_connection(
+    YAML.safe_load(
+      ERB.new(
+        File.read('spec/fake_app/active_record/database.yml')
+      ).result, [], [], true
+    )['test']
+  )
+end
 
 # config
 app = Class.new(Rails::Application)
