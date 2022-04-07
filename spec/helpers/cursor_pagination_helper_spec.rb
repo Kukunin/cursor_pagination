@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CursorPagination::ActionViewHelper do
+describe CursorPagination::ActionViewHelper, type: :helper do
 
   include_context "entities"
 
